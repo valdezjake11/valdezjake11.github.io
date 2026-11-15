@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery List App</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #eaf7ed;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0002;
+        }
+
+        h1 {
+            text-align: center;
+            color: #218838;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: gray;
+            margin-bottom: 25px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .add-btn {
+            width: 100%;
+            background: #218838;
+            color: white;
+            font-size: 16px;
+        }
+
+        .add-btn:hover {
+            background: #176b2b;
+        }
+
+        h3 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #218838;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f1f8f2;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .item-info input {
+            width: auto;
+            margin: 0;
+        }
+
+        .item-info span {
+            font-size: 14px;
+        }
+
+        .done {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            margin-left: 8px;
+        }
+
+        #count {
+            text-align: center;
+            color: #555;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🛒 Grocery List</h1>
+        <p class="subtitle">Organize your shopping list easily!</p>
+
+        <input type="text" id="itemName"
+            placeholder="Enter grocery item">
+
+        <select id="category">
+            <option value="Fruits">Fruits</option>
+            <option value="Vegetables">Vegetables</option>
+            <option value="Meat">Meat</option>
+            <option value="Drinks">Drinks</option>
+            <option value="Others">Others</option>
+        </select>
+
+        <button class="add-btn" onclick="addItem()">
+            + Add Item
+        </button>
+
+        <div id="groceryLists"></div>
+
+        <p id="count">Total Items: 0</p>
+
+    </div>
+
+    <script>
+        let groceries = [];
+
+        function addItem() {
+            let name = document.getElementById("itemName").value.trim();
+            let category = document.getElementById("category").value;
+
+            if (name === "") {
+                alert("Please enter a grocery item!");
+                return;
+            }
+
+            groceries.push({
+                name: name,
+                category: category,
+                bought: false
+            });
+
+            document.getElementById("itemName").value = "";
+
+            displayItems();
+        }
+
+        function displayItems() {
+            let list = document.getElementById("groceryLists");
+            list.innerHTML = "";
+
+            let categories = [
+                "Fruits",
+                "Vegetables",
+                "Meat",
+                "Drinks",
+                "Others"
+            ];
+
+            categories.forEach(category => {
+
+                let items = groceries.filter(
+                    item => item.category === category
+                );
+
+                if (items.length > 0) {
+
+                    let title = document.createElement("h3");
+                    title.textContent = category;
+                    list.appendChild(title);
+
+                    let ul = document.createElement("ul");
+
+                    items.forEach(item => {
+                        let index = groceries.indexOf(item);
+
+                        let li = document.createElement("li");
+
+                        let info = document.createElement("div");
+                        info.className = "item-info";
+
+                        let checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.checked = item.bought;
+
+                        checkbox.onchange = function() {
+                            item.bought = checkbox.checked;
+                            displayItems();
+                        };
+
+                        let span = document.createElement("span");
+                        span.textContent = item.name;
+
+                        if (item.bought) {
+                            span.className = "done";
+                        }
+
+                        info.appendChild(checkbox);
+                        info.appendChild(span);
+
+                        let del = document.createElement("button");
+                        del.textContent = "Delete";
+                        del.className = "delete-btn";
+
+                        del.onclick = function() {
+                            groceries.splice(index, 1);
+                            displayItems();
+                        };
+
+                        li.appendChild(info);
+                        li.appendChild(del);
+
+                        ul.appendChild(li);
+                    });
+
+                    list.appendChild(ul);
+                }
+            });
+
+            document.getElementById("count").textContent =
+                "Total Items: " + groceries.length +
+                " | Bought: " +
+                groceries.filter(item => item.bought).length;
+        }
+    </script>
+
+</body>
+</html>
